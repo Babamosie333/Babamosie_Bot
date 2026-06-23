@@ -1,6 +1,7 @@
 # ============================================================
 #  VIKRAM'S ADVANCED TELEGRAM BOT v8.0 — main.py
 #  100+ commands | 20 handler modules
+#  Render-ready with keep-alive server
 # ============================================================
 
 import asyncio
@@ -11,12 +12,40 @@ load_dotenv()
 
 import logging
 import os
+import threading
+from http.server import HTTPServer, BaseHTTPRequestHandler
 from telegram import Update
 from telegram.ext import (
     ApplicationBuilder, CommandHandler,
     MessageHandler, InlineQueryHandler,
     filters, CallbackQueryHandler
 )
+
+# ── Keep-alive server for Render free tier ─────────────────
+# Render needs an HTTP server to keep the service awake
+# UptimeRobot pings this every 5 minutes to prevent sleeping
+
+class KeepAliveHandler(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.end_headers()
+        self.wfile.write(
+            b"Babamosie Bot v8.0 is alive and running!"
+        )
+    def log_message(self, *args):
+        pass  # Silence HTTP request logs
+
+def run_keep_alive():
+    port = int(os.environ.get("PORT", 8080))
+    server = HTTPServer(("0.0.0.0", port), KeepAliveHandler)
+    print(f"✅ Keep-alive server running on port {port}")
+    server.serve_forever()
+
+# Start keep-alive in background thread
+# Only runs when PORT env var is set (i.e. on Render)
+# Does nothing when running locally
+if os.environ.get("PORT"):
+    threading.Thread(target=run_keep_alive, daemon=True).start()
 
 # ── Core ───────────────────────────────────────────────────
 from handlers.start          import start, help_command, about_command
