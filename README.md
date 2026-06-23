@@ -1,5 +1,5 @@
 # 🤖 Advanced Telegram Bot
-
+## Author: Vikram Singh
 A feature-rich Telegram bot with AI chat, weather, news, trivia game, and notes system.  
 Built with Python · Deployed on Railway (free, 24/7 uptime)
 
