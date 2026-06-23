@@ -32,8 +32,11 @@ class KeepAliveHandler(BaseHTTPRequestHandler):
         self.wfile.write(
             b"Babamosie Bot v8.0 is alive and running!"
         )
+    def do_HEAD(self):
+        self.send_response(200)
+        self.end_headers()
     def log_message(self, *args):
-        pass  # Silence HTTP request logs
+        pass
 
 def run_keep_alive():
     port = int(os.environ.get("PORT", 8080))
